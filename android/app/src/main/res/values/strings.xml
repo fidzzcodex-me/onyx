@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Onyx</string>
+    <string name="notif_channel_terminal">Sesi terminal</string>
+    <string name="notif_channel_terminal_desc">Menjaga sesi terminal tetap berjalan di latar belakang</string>
+    <string name="notif_channel_transfer">Transfer file</string>
+    <string name="notif_channel_transfer_desc">Progres unggah dan unduh SFTP, FTP, dan WebDAV</string>
+    <string name="notif_channel_alert">Pemberitahuan</string>
+    <string name="notif_channel_alert_desc">Perintah panjang selesai dan transfer selesai</string>
+    <string name="notif_terminal_title">Onyx Terminal</string>
+    <string name="notif_terminal_close_all">Tutup semua</string>
+    <string name="notif_transfer_title">Transfer berjalan</string>
+    <string name="biometric_title">Buka Onyx</string>
+    <string name="biometric_subtitle">Verifikasi identitas Anda</string>
+    <string name="biometric_cancel">Batal</string>
+</resources>
