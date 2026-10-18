@@ -30,9 +30,11 @@ class ProcessPlugin(
     @Volatile
     private var intervalMs = 2000L
 
+    private lateinit var stream: EventBridge
+
     private val tick = object : Runnable {
         override fun run() {
-            if (!stream.active) return
+            if (!::stream.isInitialized || !stream.active) return
             scope.launch {
                 try {
                     stream.emit(mapOf("type" to "processes", "items" to manager.list()))
@@ -43,14 +45,13 @@ class ProcessPlugin(
         }
     }
 
-    private val stream = EventBridge(
-        messenger,
-        Channels.PROCESS_STREAM,
-        listenHook = { handler.post(tick) },
-        cancelHook = { handler.removeCallbacks(tick) }
-    )
-
     init {
+        stream = EventBridge(
+            messenger,
+            Channels.PROCESS_STREAM,
+            listenHook = { handler.post(tick) },
+            cancelHook = { handler.removeCallbacks(tick) }
+        )
         channel.setMethodCallHandler(this)
     }
 
@@ -69,7 +70,7 @@ class ProcessPlugin(
     override fun dispose() {
         handler.removeCallbacks(tick)
         channel.setMethodCallHandler(null)
-        stream.dispose()
+        if (::stream.isInitialized) stream.dispose()
         scope.cancel()
     }
 }
