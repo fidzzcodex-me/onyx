@@ -9,6 +9,7 @@ import '../../core/theme.dart';
 import '../../core/tokens.dart';
 import '../../state/nav.dart';
 import '../../state/providers.dart';
+import '../../state/sftp_state.dart';
 import '../../state/terminal_state.dart';
 import '../../widgets/common.dart';
 import '../../widgets/feedback.dart';
