@@ -8,6 +8,7 @@ import com.onyx.terminal.terminal.TerminalSession
 import com.onyx.terminal.util.Channels
 import com.onyx.terminal.util.Disposable
 import com.onyx.terminal.util.EventBridge
+import com.onyx.terminal.util.Logger
 import com.onyx.terminal.util.OnyxException
 import com.onyx.terminal.util.bool
 import com.onyx.terminal.util.bytes
@@ -89,9 +90,20 @@ class TerminalPlugin(
             }
             "write" -> {
                 val data = call.bytes("data")
-                val session = PtyManager.get(call.int("id", -1))
-                if (data != null && session != null) session.write(data)
-                result.success(null)
+                val sid = call.int("id", -1)
+                val session = PtyManager.get(sid)
+                if (data == null) {
+                    result.success(null)
+                } else if (session == null) {
+                    Logger.w("terminal", "write: sesi $sid tidak ada")
+                    result.success(null)
+                } else if (!session.isAlive) {
+                    Logger.w("terminal", "write: sesi $sid sudah mati")
+                    result.success(null)
+                } else {
+                    session.write(data)
+                    result.success(null)
+                }
             }
             "resize" -> {
                 PtyManager.get(call.int("id", -1))?.resize(call.int("rows", 24), call.int("cols", 80))
