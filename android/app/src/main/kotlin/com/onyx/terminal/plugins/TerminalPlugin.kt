@@ -4,6 +4,7 @@ import android.content.Context
 import com.onyx.terminal.sftp.ConnectionManager
 import com.onyx.terminal.terminal.Bootstrap
 import com.onyx.terminal.terminal.PtyManager
+import com.onyx.terminal.terminal.RootfsManager
 import com.onyx.terminal.terminal.TerminalSession
 import com.onyx.terminal.util.Channels
 import com.onyx.terminal.util.Disposable
@@ -57,13 +58,23 @@ class TerminalPlugin(
             "prepare" -> scope.reply(result) {
                 val bootstrap = Bootstrap(context)
                 bootstrap.ensure()
+                val rootfs = RootfsManager.status(context)
                 mapOf(
                     "home" to bootstrap.home.absolutePath,
                     "hasBusybox" to (bootstrap.busybox != null),
                     "abi" to bootstrap.abi(),
-                    "shells" to bootstrap.availableShells()
+                    "shells" to bootstrap.availableShells(),
+                    "rootfs" to rootfs
                 )
             }
+            "bootstrapRootfs" -> scope.reply(result) {
+                val ok = RootfsManager.ensure(context)
+                mapOf(
+                    "ok" to ok,
+                    "status" to RootfsManager.status(context)
+                )
+            }
+            "rootfsStatus" -> result.success(RootfsManager.status(context))
             "start" -> scope.reply(result) {
                 val env = call.map("env")?.mapValues { it.value?.toString() ?: "" } ?: emptyMap()
                 val session = PtyManager.startLocal(
