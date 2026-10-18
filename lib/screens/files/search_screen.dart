@@ -12,13 +12,11 @@ import '../../core/theme.dart';
 import '../../core/tokens.dart';
 import '../../state/files_state.dart';
 import '../../state/providers.dart';
-import '../../state/settings.dart';
 import '../../widgets/common.dart';
 import '../../widgets/feedback.dart';
 import '../../widgets/fields.dart';
 import '../viewers/viewer_router.dart';
 import 'file_sheets.dart';
-import 'files_screen.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key, required this.root});
