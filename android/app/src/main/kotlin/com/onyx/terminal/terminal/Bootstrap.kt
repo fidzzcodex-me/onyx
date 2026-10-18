@@ -43,6 +43,7 @@ class Bootstrap(private val context: Context) {
             copyAsset("assets/default_config/$name", File(home, ".config/onyx/$name"))
         }
         linkBusyboxApplets()
+        installPkgScript()
     }
 
     fun launchSpec(shellPref: String, cwd: String?, extraEnv: Map<String, String>, pathExtra: String?, title: String?): LaunchSpec {
@@ -156,6 +157,27 @@ class Bootstrap(private val context: Context) {
             stamp.writeText(signature)
         } catch (error: Exception) {
             Logger.w("bootstrap", "Gagal membuat tautan applet busybox", error)
+        }
+    }
+
+    private fun installPkgScript() {
+        val target = File(binDir, "pkg")
+        try {
+            context.assets.open("flutter_assets/assets/shell/pkg").use { input ->
+                target.outputStream().use { input.copyTo(it) }
+            }
+            target.setExecutable(true, false)
+        } catch (error: Exception) {
+            try {
+                if (!target.exists()) {
+                    target.writeText(
+                        "#!/system/bin/sh\necho pkg: script missing, reinstall app\n"
+                    )
+                    target.setExecutable(true, false)
+                }
+            } catch (_: Exception) {
+            }
+            Logger.w("bootstrap", "Gagal memasang pkg", error)
         }
     }
 
