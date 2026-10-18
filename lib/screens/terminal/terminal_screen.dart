@@ -4,8 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:xterm/xterm.dart';
 
-import '../../core/errors.dart';
-import '../../core/models.dart';
 import '../../core/terminal_theme.dart';
 import '../../core/theme.dart';
 import '../../core/tokens.dart';
