@@ -94,7 +94,6 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       if (!mounted) return;
       _controller.language = doc.language;
       _controller.value = TextEditingValue(text: doc.text, selection: const TextSelection.collapsed(offset: 0));
-      _undo.clear();
       setState(() {
         _doc = doc;
         _baseline = doc.text;
@@ -687,7 +686,6 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     final p = context.palette;
     final fontSize = settings.editorFontSize;
     final style = OnyxFonts.mono(size: fontSize, color: const Color(0xFFD4D4D4), height: 1.5);
-    final lineHeight = fontSize * 1.5;
     final wrap = settings.editorWrap;
     final numbers = settings.editorLineNumbers && !wrap;
     final lineCount = '\n'.allMatches(_controller.text).length + 1;
