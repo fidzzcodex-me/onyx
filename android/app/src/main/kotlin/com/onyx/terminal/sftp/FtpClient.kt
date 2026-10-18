@@ -128,7 +128,8 @@ class FtpRemoteFs(
     @Synchronized
     override fun chmod(path: String, mode: Int) {
         val octal = Integer.toOctalString(mode and 0xfff)
-        if (!FTPReply.isPositiveCompletion(control.sendSiteCommand("CHMOD $octal $path"))) {
+        control.sendSiteCommand("CHMOD $octal $path")
+        if (!FTPReply.isPositiveCompletion(control.replyCode)) {
             throw OnyxException("unsupported", "Server FTP tidak mendukung CHMOD")
         }
     }
