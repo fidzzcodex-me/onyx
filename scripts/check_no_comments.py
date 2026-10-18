@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 EXTENSIONS = {".dart", ".kt", ".kts", ".cpp", ".h", ".java", ".gradle"}
 SKIP_PARTS = {"build", ".dart_tool", ".gradle", ".cxx", "node_modules"}
+SKIP_FILES = {"GeneratedPluginRegistrant.java"}
 
 
 def strip_strings(line: str) -> str:
@@ -55,7 +56,7 @@ def main() -> int:
     for path in sorted(ROOT.rglob("*")):
         if path.suffix not in EXTENSIONS or not path.is_file():
             continue
-        if SKIP_PARTS.intersection(path.relative_to(ROOT).parts):
+        if SKIP_PARTS.intersection(path.relative_to(ROOT).parts) or path.name in SKIP_FILES:
             continue
         for number, text in check(path):
             bad += 1
