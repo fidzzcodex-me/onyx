@@ -375,7 +375,7 @@ class _LogsViewState extends ConsumerState<LogsView> {
                 tooltip: 'Hapus log',
                 onPressed: () async {
                   final ok = await confirm(context, title: 'Hapus log?', message: 'Berkas log aplikasi dikosongkan.', confirmLabel: 'Hapus', danger: true);
-                  if (!ok || !mounted) return;
+                  if (!ok || !context.mounted) return;
                   await runGuarded(context, () async {
                     await ref.read(apiProvider).system.clearLogs();
                     await _load();
