@@ -25,7 +25,9 @@ class EncodingDetectorTest {
 
     @Test
     fun fallsBackForInvalidUtf8() {
-        val detected = EncodingDetector.detect(byteArrayOf(0x68, 0xE9, 0x6C, 0x6C, 0x6F))
+        val detected = EncodingDetector.detect(
+            byteArrayOf(0x68, 0xE9.toByte(), 0x6C, 0x6C, 0x6F)
+        )
         assertEquals("windows-1252", detected.name)
     }
 
