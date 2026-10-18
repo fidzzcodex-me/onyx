@@ -1,0 +1,132 @@
+#!/system/bin/sh
+PREFIX="${PREFIX:-$HOME/../usr}"
+BIN="$PREFIX/bin"
+LIB="$PREFIX/lib"
+ETC="$PREFIX/etc"
+VAR="$PREFIX/var/lib/pkg"
+mkdir -p "$BIN" "$LIB" "$ETC" "$VAR" 2>/dev/null
+
+ABI=$(getprop ro.product.cpu.abi 2>/dev/null || uname -m)
+case "$ABI" in
+  arm64-v8a|aarch64) ARCH=aarch64 ;;
+  armeabi-v7a|armv7*|arm) ARCH=arm ;;
+  x86_64) ARCH=x86_64 ;;
+  x86) ARCH=i686 ;;
+  *) ARCH=aarch64 ;;
+esac
+
+INDEX="$VAR/index"
+cat > "$INDEX" << 'IDX'
+curl|https://github.com/stunnel/static-curl/releases/download/8.11.1/curl-linux-%ARCH%-musl.tar.xz|curl|Static curl
+wget|https://github.com/yuryu/wget-android/releases/download/v1.21.4/wget-%ARCH%|wget|Static wget
+tree|busybox|tree|BusyBox applet
+nano|busybox|sed|Use vi via busybox for now
+htop|busybox|top|Use top via busybox
+git|https://github.com/termux-play-store/termux-packages/releases/download/bootstrap-2024.12.31-r1-%ARCH%.zip|SKIP|Use remote git via SSH for now
+IDX
+
+cmd="$1"
+shift 2>/dev/null
+
+list_pkgs() {
+  echo "Package index (Onyx pkg, style Termux):"
+  echo "  ARCH=$ARCH  PREFIX=$PREFIX"
+  echo ""
+  while IFS='|' read -r name url bin desc; do
+    [ -z "$name" ] && continue
+    status="not installed"
+    if [ -x "$BIN/$name" ] || command -v "$name" >/dev/null 2>&1; then
+      status="installed"
+    fi
+    printf "  %-12s %-12s %s\n" "$name" "$status" "$desc"
+  done < "$INDEX"
+  echo ""
+  echo "Usage: pkg install <name> | pkg uninstall <name> | pkg list | pkg search <q>"
+}
+
+install_pkg() {
+  name="$1"
+  [ -z "$name" ] && { echo "pkg: install needs a package name"; return 1; }
+  line=$(grep "^${name}|" "$INDEX" | head -1)
+  [ -z "$line" ] && { echo "pkg: package '$name' not found"; return 1; }
+  url=$(echo "$line" | cut -d'|' -f2 | sed "s/%ARCH%/$ARCH/g")
+  bin=$(echo "$line" | cut -d'|' -f3)
+  if [ "$url" = "busybox" ]; then
+    bb=$(command -v busybox 2>/dev/null || ls "$ONYX_NATIVE_LIB_DIR/libbusybox.so" 2>/dev/null)
+    if [ -z "$bb" ]; then
+      echo "pkg: busybox not available"
+      return 1
+    fi
+    ln -sf "$bb" "$BIN/$name" 2>/dev/null || cp -f "$bb" "$BIN/$name"
+    chmod 755 "$BIN/$name" 2>/dev/null
+    echo "pkg: linked $name -> busybox"
+    return 0
+  fi
+  if [ "$bin" = "SKIP" ]; then
+    echo "pkg: $name is not a simple static binary yet."
+    echo "     For git/build tools, use SSH to a real server or Termux side-by-side."
+    return 1
+  fi
+  echo "pkg: downloading $name for $ARCH ..."
+  tmp="$VAR/dl-$name"
+  mkdir -p "$tmp"
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL -o "$tmp/pkg.bin" "$url" || { echo "pkg: download failed"; return 1; }
+  elif command -v wget >/dev/null 2>&1; then
+    wget -q -O "$tmp/pkg.bin" "$url" || { echo "pkg: download failed"; return 1; }
+  else
+    echo "pkg: need curl or wget to download packages."
+    echo "     First install is limited until a downloader is present."
+    echo "     Tip: busybox applets work without download: pkg install tree"
+    return 1
+  fi
+  chmod 755 "$tmp/pkg.bin"
+  case "$url" in
+    *.tar.xz|*.tar.gz)
+      (cd "$tmp" && tar -xf pkg.bin 2>/dev/null)
+      found=$(find "$tmp" -type f -name "$bin" 2>/dev/null | head -1)
+      if [ -n "$found" ]; then
+        cp -f "$found" "$BIN/$name"
+        chmod 755 "$BIN/$name"
+        echo "pkg: installed $name -> $BIN/$name"
+      else
+        echo "pkg: archive extracted but binary '$bin' not found"
+        return 1
+      fi
+      ;;
+    *)
+      cp -f "$tmp/pkg.bin" "$BIN/$name"
+      chmod 755 "$BIN/$name"
+      echo "pkg: installed $name -> $BIN/$name"
+      ;;
+  esac
+  rm -rf "$tmp"
+}
+
+uninstall_pkg() {
+  name="$1"
+  [ -z "$name" ] && { echo "pkg: uninstall needs a name"; return 1; }
+  if [ -e "$BIN/$name" ]; then
+    rm -f "$BIN/$name"
+    echo "pkg: removed $name"
+  else
+    echo "pkg: $name not installed in $BIN"
+  fi
+}
+
+search_pkg() {
+  q="$1"
+  grep -i "$q" "$INDEX" | while IFS='|' read -r name url bin desc; do
+    printf "  %-12s %s\n" "$name" "$desc"
+  done
+}
+
+case "$cmd" in
+  install|in|i) install_pkg "$1" ;;
+  uninstall|remove|rm) uninstall_pkg "$1" ;;
+  list|ls) list_pkgs ;;
+  search|s) search_pkg "$1" ;;
+  update|upgrade) echo "pkg: index is embedded; no remote update yet" ;;
+  help|-h|--help|"") list_pkgs ;;
+  *) echo "pkg: unknown command '$cmd'"; list_pkgs; exit 1 ;;
+esac

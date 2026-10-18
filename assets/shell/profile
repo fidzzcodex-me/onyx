@@ -1,5 +1,8 @@
-export PS1='\w \$ '
+export PS1='$ '
+export PATH="$PREFIX/bin:$PATH"
+[ -f "$HOME/.bashrc" ] && . "$HOME/.bashrc"
 alias ls='ls --color=auto 2>/dev/null || ls'
 alias ll='ls -l'
 alias la='ls -la'
 alias ..='cd ..'
+command -v pkg >/dev/null 2>&1 || alias pkg='sh "$PREFIX/bin/pkg"'
