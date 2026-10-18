@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../../core/theme.dart';
 import '../../core/tokens.dart';
 import '../../state/auth_state.dart';
 import '../../state/providers.dart';
