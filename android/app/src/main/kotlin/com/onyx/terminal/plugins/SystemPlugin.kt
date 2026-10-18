@@ -38,22 +38,23 @@ class SystemPlugin(
     @Volatile
     private var intervalMs = 1000L
 
+    private lateinit var stream: EventBridge
+
     private val tick = object : Runnable {
         override fun run() {
-            if (!stream.active) return
+            if (!::stream.isInitialized || !stream.active) return
             scope.launchSnapshot()
             handler.postDelayed(this, intervalMs)
         }
     }
 
-    private val stream = EventBridge(
-        messenger,
-        Channels.SYSTEM_STREAM,
-        listenHook = { handler.post(tick) },
-        cancelHook = { handler.removeCallbacks(tick) }
-    )
-
     init {
+        stream = EventBridge(
+            messenger,
+            Channels.SYSTEM_STREAM,
+            listenHook = { handler.post(tick) },
+            cancelHook = { handler.removeCallbacks(tick) }
+        )
         channel.setMethodCallHandler(this)
     }
 
@@ -127,7 +128,7 @@ class SystemPlugin(
     override fun dispose() {
         handler.removeCallbacks(tick)
         channel.setMethodCallHandler(null)
-        stream.dispose()
+        if (::stream.isInitialized) stream.dispose()
         scope.cancel()
     }
 }
