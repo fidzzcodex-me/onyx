@@ -92,7 +92,7 @@ class SshShellSession(
             }
             emitLocal("Terhubung.\r\n")
             readLoop(started.inputStream)
-            exitCode = started.exitStatus ?: 0
+            exitCode = session.exitStatus ?: 0
         } catch (error: Exception) {
             Logger.w("ssh-shell", "Sesi SSH berakhir dengan galat", error)
             emitLocal("\r\n[Koneksi gagal: ${error.message ?: error.javaClass.simpleName}]\r\n")
