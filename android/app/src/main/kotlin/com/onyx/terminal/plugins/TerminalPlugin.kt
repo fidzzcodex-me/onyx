@@ -58,6 +58,10 @@ class TerminalPlugin(
             "prepare" -> scope.reply(result) {
                 val bootstrap = Bootstrap(context)
                 bootstrap.ensure()
+                if (RootfsManager.prootBinary(context) != null && !RootfsManager.isReady(context)) {
+                    Logger.d("terminal", "Auto bootstrap Alpine rootfs")
+                    RootfsManager.ensure(context)
+                }
                 val rootfs = RootfsManager.status(context)
                 mapOf(
                     "home" to bootstrap.home.absolutePath,
