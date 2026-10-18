@@ -55,6 +55,9 @@ class Bootstrap(private val context: Context) {
     }
 
     fun resolveShell(preference: String): Pair<String, List<String>> {
+        if (preference != "android" && preference != "system") {
+            RootfsManager.prootArgs(context, "/bin/sh")?.let { return it }
+        }
         val bb = busybox
         fun find(name: String): String? {
             val dirs = listOf(binDir.absolutePath, "/system/bin", "/system/xbin", "/vendor/bin")
@@ -70,7 +73,7 @@ class Bootstrap(private val context: Context) {
             }
             "zsh" -> find("zsh")?.let { return Pair(it, listOf("zsh", "-i")) }
             "fish" -> find("fish")?.let { return Pair(it, listOf("fish", "-i")) }
-            "sh" -> {
+            "sh", "android", "system" -> {
                 return Pair("/system/bin/sh", listOf("sh"))
             }
         }
@@ -84,7 +87,8 @@ class Bootstrap(private val context: Context) {
     }
 
     fun availableShells(): List<String> {
-        val out = mutableListOf("auto", "sh")
+        val out = mutableListOf("auto", "sh", "android")
+        if (RootfsManager.isReady(context)) out.add(0, "alpine")
         for (name in listOf("bash", "zsh", "fish")) {
             val dirs = listOf(binDir.absolutePath, "/system/bin", "/system/xbin")
             if (dirs.any { File(it, name).canExecute() }) out.add(name)
