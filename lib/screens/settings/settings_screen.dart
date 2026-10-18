@@ -7,7 +7,6 @@ import '../../core/theme.dart';
 import '../../core/tokens.dart';
 import '../../state/auth_state.dart';
 import '../../state/providers.dart';
-import '../../state/settings.dart';
 import '../../widgets/common.dart';
 import '../../widgets/feedback.dart';
 import '../../widgets/fields.dart';
