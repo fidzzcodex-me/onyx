@@ -25,3 +25,4 @@ android/app/src/main/jniLibs/*/libbusybox.so
 *.jks
 
 assets/google_fonts/*.ttf
+android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
