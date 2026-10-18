@@ -1,0 +1,33 @@
+case $- in
+  *i*) ;;
+  *) return ;;
+esac
+
+export HISTFILE="$HOME/.bash_history"
+export HISTSIZE=5000
+export HISTFILESIZE=10000
+export HISTCONTROL=ignoredups:erasedups
+shopt -s histappend checkwinsize cmdhist 2>/dev/null
+
+if [ -f "$HOME/.config/onyx/aliases" ]; then
+  . "$HOME/.config/onyx/aliases"
+fi
+
+__onyx_prompt() {
+  local status=$?
+  local reset='\[\e[0m\]'
+  local dim='\[\e[38;5;245m\]'
+  local accent='\[\e[38;5;75m\]'
+  local bad='\[\e[38;5;203m\]'
+  local mark="$accent"
+  [ "$status" -ne 0 ] && mark="$bad"
+  PS1="${dim}\w${reset} ${mark}\$${reset} "
+}
+PROMPT_COMMAND=__onyx_prompt
+
+onyx_info() {
+  printf 'Onyx %s\n' "${ONYX_VERSION:-}"
+  printf 'Shell  %s\n' "$SHELL"
+  printf 'Home   %s\n' "$HOME"
+  printf 'Native %s\n' "${ONYX_NATIVE_LIB_DIR:-}"
+}
