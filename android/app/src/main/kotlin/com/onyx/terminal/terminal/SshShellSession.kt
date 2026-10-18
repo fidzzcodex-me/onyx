@@ -99,6 +99,9 @@ class SshShellSession(
             exitCode = 255
         } finally {
             alive = false
+            synchronized(writeLock) {
+                stdin = null
+            }
             batcher.flush()
             watcher.cancel()
             closeQuietly()
@@ -109,7 +112,7 @@ class SshShellSession(
     private fun readLoop(stream: InputStream) {
         val buffer = ByteArray(8192)
         try {
-            while (true) {
+            while (alive) {
                 val count = stream.read(buffer)
                 if (count < 0) break
                 if (count == 0) continue
@@ -123,7 +126,7 @@ class SshShellSession(
     }
 
     override fun write(data: ByteArray) {
-        if (!alive) return
+        if (!alive || data.isEmpty()) return
         watcher.onInput(data)
         synchronized(writeLock) {
             val out = stdin
@@ -134,7 +137,8 @@ class SshShellSession(
             try {
                 out.write(data)
                 out.flush()
-            } catch (_: IOException) {
+            } catch (error: IOException) {
+                Logger.w("ssh-shell", "Gagal menulis ke shell SSH ($id)", error)
             }
         }
     }
