@@ -11,3 +11,7 @@
 | Video tidak mau diputar | Codec tidak didukung perangkat | Buka dengan aplikasi lain dari menu |
 | `flutter analyze` mengeluh | Kode belum pernah dikompilasi pembuatnya | Perbaiki galat yang dilaporkan, lalu jalankan ulang |
 | Transfer "Gagal" | Lihat pesan di kartu transfer | Coba lagi atau periksa izin tulis di tujuan |
+
+## Analyze/Test gagal: IconData is final
+
+font_awesome_flutter 10.x memperluas `IconData`, yang menjadi kelas final pada Flutter 3.41 ke atas. Workflow CI menyematkan Flutter 3.35.7. Naikkan versi itu hanya setelah font_awesome_flutter merilis versi yang kompatibel.
