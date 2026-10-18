@@ -115,6 +115,7 @@ class Bootstrap(private val context: Context) {
         env["ENV"] = File(home, ".profile").absolutePath
         env["EXTERNAL_STORAGE"] = "/sdcard"
         env["ONYX_VERSION"] = "1.0.0"
+        env["PROOT_TMP_DIR"] = tmpDir.absolutePath
         env["ONYX_NATIVE_LIB_DIR"] = nativeDir
         env["ANDROID_ROOT"] = System.getenv("ANDROID_ROOT") ?: "/system"
         env["ANDROID_DATA"] = System.getenv("ANDROID_DATA") ?: "/data"
