@@ -16,7 +16,7 @@ if (hasReleaseKeystore) {
 
 android {
     namespace = "com.onyx.terminal"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -122,6 +122,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.biometric:biometric:1.1.0")
+    implementation("net.i2p.crypto:eddsa:0.3.0")
 
     implementation("com.hierynomus:sshj:0.39.0")
     implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
