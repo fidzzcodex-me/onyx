@@ -132,6 +132,10 @@ jobs:
         continue-on-error: true
         run: bash scripts/fetch_fonts.sh
 
+      - name: Fetch proot
+        if: steps.gate.outputs.run == 'true'
+        run: bash scripts/fetch_proot.sh
+
       - name: Install dependencies
         if: steps.gate.outputs.run == 'true'
         run: flutter pub get
