@@ -6,7 +6,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../core/file_icons.dart';
 import '../../core/format.dart';
 import '../../core/models.dart';
-import '../../core/theme.dart';
 import '../../core/tokens.dart';
 import '../../state/files_state.dart';
 import '../../state/settings.dart';
