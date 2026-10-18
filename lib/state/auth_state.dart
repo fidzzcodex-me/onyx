@@ -194,20 +194,21 @@ class AuthNotifier extends StateNotifier<AuthState> with WidgetsBindingObserver 
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState lifecycle) {
-    if (!state.hasPin) return;
-    if (lifecycle == AppLifecycleState.paused || lifecycle == AppLifecycleState.hidden) {
-      state = state.copyWith(backgroundedAt: DateTime.now());
-    } else if (lifecycle == AppLifecycleState.resumed) {
-      final since = state.backgroundedAt;
-      if (since != null && state.stage == Stage.ready) {
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final current = this.state;
+    if (!current.hasPin) return;
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+      this.state = current.copyWith(backgroundedAt: DateTime.now());
+    } else if (state == AppLifecycleState.resumed) {
+      final since = current.backgroundedAt;
+      if (since != null && current.stage == Stage.ready) {
         final timeout = _ref.read(settingsProvider).lockTimeoutSec;
         if (DateTime.now().difference(since).inSeconds >= timeout) {
-          state = state.copyWith(stage: Stage.locked, clearBackgrounded: true);
+          this.state = current.copyWith(stage: Stage.locked, clearBackgrounded: true);
           return;
         }
       }
-      state = state.copyWith(clearBackgrounded: true);
+      this.state = current.copyWith(clearBackgrounded: true);
     }
   }
 }
