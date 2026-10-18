@@ -529,7 +529,7 @@ class Staggered extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (MediaQuery.of(context).disableAnimations) return child;
-    final delay = Motion.stagger.inMilliseconds * math.min(index, 8);
+    final int delay = (Motion.stagger.inMilliseconds * math.min(index, 8)).toInt();
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
       duration: Duration(milliseconds: 220 + delay),
