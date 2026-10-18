@@ -70,11 +70,35 @@ class TermSession {
       alt = false;
       _publish();
     }
+    if (isSsh) {
+      _localEcho(out);
+    }
     send(out);
   }
 
+  void _localEcho(String data) {
+    if (data.isEmpty) return;
+    final buf = StringBuffer();
+    for (final unit in data.codeUnits) {
+      if (unit == 0x7f || unit == 0x08) {
+        buf.write('\x08 \x08');
+      } else if (unit == 0x0d || unit == 0x0a) {
+        buf.write('\r\n');
+      } else if (unit >= 0x20 && unit != 0x7f) {
+        buf.writeCharCode(unit);
+      }
+    }
+    final text = buf.toString();
+    if (text.isNotEmpty) terminal.write(text);
+  }
+
   void send(String text) {
-    api.terminal.write(id, Uint8List.fromList(utf8.encode(text))).catchError((Object _) {});
+    if (text.isEmpty) return;
+    api.terminal.write(id, Uint8List.fromList(utf8.encode(text))).catchError((Object e) {
+      if (kDebugMode) {
+        print('terminal write failed id=$id: $e');
+      }
+    });
   }
 
   void feed(List<int> bytes) => _decoder.add(bytes);
