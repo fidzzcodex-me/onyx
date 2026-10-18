@@ -43,6 +43,6 @@ object Limits {
     const val PIN_MIN = 4
     const val PIN_MAX = 6
     const val PASSWORD_MIN = 8
-    const val OUTPUT_BATCH_MS = 12L
-    const val OUTPUT_BATCH_MAX = 65536
+    const val OUTPUT_BATCH_MS = 4L
+    const val OUTPUT_BATCH_MAX = 32768
 }
