@@ -33,7 +33,7 @@ class Bootstrap(private val context: Context) {
         binDir.mkdirs()
         tmpDir.mkdirs()
         copyAsset("assets/shell/bashrc", File(home, ".bashrc"))
-        copyAsset("assets/shell/profile", File(home, ".profile"))
+        copyAssetForced("assets/shell/profile", File(home, ".profile"))
         val defaults = try {
             context.assets.list("flutter_assets/assets/default_config") ?: emptyArray()
         } catch (_: Exception) {
@@ -127,6 +127,10 @@ class Bootstrap(private val context: Context) {
 
     private fun copyAsset(assetPath: String, target: File) {
         if (target.exists()) return
+        copyAssetForced(assetPath, target)
+    }
+
+    private fun copyAssetForced(assetPath: String, target: File) {
         try {
             context.assets.open("flutter_assets/$assetPath").use { input ->
                 target.parentFile?.mkdirs()
